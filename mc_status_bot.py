@@ -12,11 +12,17 @@ from pathlib import Path
 
 from mcstatus import JavaServer
 
-MC_ADDRESS = os.environ["MC_ADDRESS"]
-WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
+MC_ADDRESS = os.environ.get("MC_ADDRESS", "").strip()
+WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL", "").strip()
 STATE_FILE = Path("state.json")
 RETRIES = 3          # Versuche, bevor "offline" gilt
 RETRY_DELAY = 10     # Sekunden zwischen den Versuchen
+
+
+if not MC_ADDRESS:
+    raise RuntimeError("MC_ADDRESS fehlt oder ist leer.")
+if not WEBHOOK_URL:
+    raise RuntimeError("DISCORD_WEBHOOK_URL fehlt oder ist leer.")
 
 
 def check():
@@ -46,12 +52,13 @@ def post(embed):
 def main():
     status = check()
     online = status is not None
+    manual_run = os.environ.get("NOTIFY_ON_MANUAL", "").lower() == "true"
 
     old = None
     if STATE_FILE.exists():
         old = json.loads(STATE_FILE.read_text()).get("online")
 
-    if old is not None and old != online:
+    if old is None or old != online or manual_run:
         now = datetime.now(timezone.utc).isoformat()
         if online:
             post({

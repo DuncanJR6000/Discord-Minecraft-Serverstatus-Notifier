@@ -29,6 +29,7 @@ jobs:
         env:
           MC_ADDRESS: ${{ vars.MC_ADDRESS }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          NOTIFY_ON_MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
 
       - name: Zustand speichern
         run: |
