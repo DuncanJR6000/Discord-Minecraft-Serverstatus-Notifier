@@ -1,0 +1,38 @@
+name: MC Status
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # alle 5 Minuten (GitHub-Minimum)
+  workflow_dispatch:         # manueller Start über den Actions-Tab
+
+permissions:
+  contents: write            # nötig, um state.json zu committen
+
+concurrency:
+  group: mc-status
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Server prüfen
+        run: python mc_status_bot.py
+        env:
+          MC_ADDRESS: ${{ vars.MC_ADDRESS }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Zustand speichern
+        run: |
+          git config user.name "mc-status-bot"
+          git config user.email "mc-status-bot@users.noreply.github.com"
+          git add state.json
+          git diff --cached --quiet || (git commit -m "Status aktualisiert" && git push)
