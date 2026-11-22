@@ -63,7 +63,6 @@ def main():
         if online:
             post({
                 "title": "🟢 Server ist online!",
-                "description": f"`{MC_ADDRESS}` ist jetzt erreichbar.",
                 "color": 0x57F287,
                 "timestamp": now,
                 "fields": [
