@@ -87,16 +87,22 @@ def format_relative_time(timestamp):
 
 
 def offline_title(state):
-    version = state.get("version") or "Unbekannt"
+    version = state.get("version")
     players_online = state.get("players_online")
     players_max = state.get("players_max")
+
+    details = []
+    if version:
+        details.append(f"Version {version}")
     if players_online is not None and players_max is not None:
-        players = f"{players_online}/{players_max}"
-    else:
-        players = "-/-"
+        details.append(f"Spieler {players_online}/{players_max}")
+
     relative_time = format_relative_time(state.get("last_seen"))
-    time_text = f" {relative_time}" if relative_time else ""
-    return f"🔴 Server ist offline! Version {version} Spieler {players}{time_text}"
+    if relative_time:
+        details.append(relative_time)
+
+    suffix = f" {' '.join(details)}" if details else ""
+    return f"🔴 Server ist offline!{suffix}"
 
 
 def post_embed(embed):
