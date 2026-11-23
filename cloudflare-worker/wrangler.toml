@@ -1,0 +1,8 @@
+name = "minecraft-status"
+main = "src/index.js"
+compatibility_date = "2026-11-23"
+
+[vars]
+GITHUB_OWNER = "DuncanJR6000"
+GITHUB_REPO = "Discord-Minecraft-Serverstatus-Notifier"
+GITHUB_WORKFLOW = "mc-status.yml"
